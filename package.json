@@ -8,10 +8,12 @@
   ],
   "license": "ISC",
   "author": "Hemanshu Chaudhari",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
+
   "scripts": {
-    "start": "node index.js"
+     "start": "node index.js",
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
@@ -19,7 +21,6 @@
     "mongoose": "^9.10.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
-    "prettier": "^3.9.8"
+    "nodemon": "^3.1.14"
   }
 }
