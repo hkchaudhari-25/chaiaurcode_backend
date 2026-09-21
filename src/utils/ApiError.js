@@ -13,10 +13,10 @@ class ApiError extends Error{
         this.errors=errors
 
         //A stack trace tells you where the error happened This is extremely useful for debugging
-        if(statck){
-            this.stack= statck  //stack trace
+        if(stack){
+            this.stack= stack  //stack trace
         } else {
-            Error.captureStackTrace(this,this.constructor)
+            Error.captureStackTrace(this, this.constructor)
         }
     }
 }
