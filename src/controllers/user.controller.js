@@ -28,19 +28,27 @@ field?.trim() === "")
     throw new ApiError(400, "all fields are required")
 }
 
-const existedUser = User.findOne({
+const existedUser = await User.findOne({
     $or : [{username} , {email}]
 })
 
 if(existedUser){
     throw new ApiError(409,"User with username or email")
 }
+console.log("req.files:", req.files); //debugging statements
+console.log("req.file:", req.file);
 
 const avatarLocalPath = req.files?.avatar[0]?.path;
-const coverimageLocalPath = req.files?.coverimage[0]?.path;
+// const coverimageLocalPath = req.files?.coverimage[0]?.path;
 
 if (!avatarLocalPath) {
-    throw new ApiError(404 , "Avatat file is required")
+    throw new ApiError(404 , "Avatat file is required") // to check that multer has saved file locally or not
+}
+
+let coverimageLocalPath; 
+//check and handle if coverimage is not uploaded by user //isArray cheks rather array lements are uploaded or not
+if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+    coverimageLocalPath = req.files.coverimage[0].path;
 }
 
 const avatar = await uploadFileCloudinary(avatarLocalPath);
@@ -48,7 +56,7 @@ const coverimage = await uploadFileCloudinary(coverimageLocalPath);
 
 
 if(!avatar){
-    throw new ApiError(400 , "Avatar file is required")
+    throw new ApiError(400 , "Avatar file is not uploaded on Cloudinary") //to check that file is uploaded to cloudinary or not
 }
 
 const user = await User.create({
@@ -69,7 +77,10 @@ if(!createdUser){
 }
 
 return res.status(201).json(
-    200,createdUser,"User Registered successfully"
+    new ApiResponse (
+        200,
+        createdUser,
+        "User Registered successfully")
 )
 
 }

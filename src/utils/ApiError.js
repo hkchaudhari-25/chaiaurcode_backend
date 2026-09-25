@@ -3,7 +3,7 @@ class ApiError extends Error{
         statusCode,     //http status code
         message = "Something went wrong.." , //do not prefer this message in production level code
         errors= [] , //addition error datils
-        statck = "" //stack trace
+        stack = "" //stack trace
     ){  
         super(message)      //parent Error constuctor
         this.statusCode = statusCode //http status code
@@ -14,7 +14,7 @@ class ApiError extends Error{
 
         //A stack trace tells you where the error happened This is extremely useful for debugging
         if(stack){
-            this.stack= stack  //stack trace
+            this.stack = stack  //stack trace
         } else {
             Error.captureStackTrace(this, this.constructor)
         }
