@@ -139,7 +139,7 @@ const {accessToken , refreshToken} = await generateAccessAndRefreshToken(user._i
 
 const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
  const options= {
-    httponly : true ,
+    httpOnly : true ,
     secure : true
  }
 
@@ -163,8 +163,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1
             }
         },
         {
@@ -241,6 +241,8 @@ const changeCurrentPassword = asyncHandler(async (req,res) => {
 
     const {oldPassword , newPassword} = req.body
     const user = await User.findById(req.user?._id)
+    console.log("password:", oldPassword)
+    console.log("stored password:", user.password)
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
     if(!isPasswordCorrect){

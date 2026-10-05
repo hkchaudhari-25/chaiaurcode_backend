@@ -11,7 +11,7 @@ import { loginUser ,
          updateUserCoverImage ,
          getUserChannelProfile ,
          getwatchHistory } from "../controllers/user.controller.js"
-import { verify } from "jsonwebtoken"
+
 
 const router = Router()
 
@@ -39,7 +39,16 @@ router.route("/avatar").patch(verifyJWT , upload.single("avatar") , updateUserAv
 
 router.route("/cover-image").patch(verifyJWT , upload.single("coverImage") , updateUserCoverImage)
 
-router.route("/c/:username").get(verifyJWT , getUserChannelProfile)
+// router.route("/c/:username").get(verifyJWT , getUserChannelProfile)
+router.route("/c/:username").get((req, res) => {
+    console.log("CHANNEL ROUTE REACHED");
+    console.log("username:", req.params.username);
+
+    res.json({
+        message: "Route is working",
+        username: req.params.username
+    });
+});
 router.route("/history").get(verifyJWT , getwatchHistory)
 
 
