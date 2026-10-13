@@ -132,7 +132,7 @@ if(!user){
 const isPasswordValid = await user.isPasswordCorrect(password)
 
 if(!isPasswordValid){
-    throw new ApiError(402, "Unvalid  credentials")
+    throw new ApiError(401, "Invalid  credentials")
 }
 
 const {accessToken , refreshToken} = await generateAccessAndRefreshToken(user._id)
