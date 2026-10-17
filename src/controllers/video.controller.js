@@ -81,6 +81,74 @@ const getVideobyId = asyncHandler(async(req , res) => {
     )
 })
 
+const getAllVideos = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query 
+    
+    const pipeline = [];
+
+    pipeline.push({
+        $match : {
+            isPublished : true
+        }, 
+    });
+    
+    if(userId){
+        if(!mongoose.isValidObjectId(userId))
+        throw new ApiError (404 , "User id not valid")
+    
+     pipeline.push({
+        $match : {
+            owner : new mongoose.Types.ObjectId(userId),
+        },
+     })
+    }
+
+    if(query?.trim()){
+        pipeline.push({
+            $match: {
+                $or : [
+                    {title : {$regex: query.trim(), $options : "i"}},
+                    {description : {$regex: query.trim(), $options : "i"}},
+                ],
+            },
+        })
+    }
+
+    const allowedSortFields = [
+        "createdAt",
+        "views",
+        "title",
+        "duration"
+    ];
+
+      if (!allowedSortFields.includes(sortBy)) {
+    throw new ApiError(400, "Invalid sort field");
+  }
+
+  if (!["asc", "desc"].includes(sortType)) {
+    throw new ApiError(400, "Invalid sort type");
+  }
+
+   pipeline.push({
+    $sort: {
+      [sortBy]: sortType === "asc" ? 1 : -1,
+      _id: 1,
+    },
+  });
+
+  // Step 6: Paginate the results
+  const aggregate = Video.aggregate(pipeline);
+
+  const videos = await Video.aggregatePaginate(aggregate, {
+    page: Number(page),
+    limit: Number(limit),
+  });
+
+  // Step 7: Send the response
+  return res.status(200).json(
+    new ApiResponse(200, videos, "Videos fetched successfully")
+  );
+});
 
 
-export { publishVideo , getVideobyId};
+export { publishVideo , getVideobyId ,  getAllVideos};
