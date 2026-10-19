@@ -70,7 +70,7 @@ const getVideobyId = asyncHandler(async(req , res) => {
     throw new ApiError(400 , "Invalid object ID ")
    }
 
-   const video = Video.FindById(videoId);
+   const video = Video.findById(videoId);
     if(!videoId){
         throw new ApiError(404 , "Video not found")
     }
@@ -214,14 +214,14 @@ const deleteVideo = asyncHandler(async(req,res)=> {
         throw new ApiError(401 , "Invalid video Id")
     }
 
-    const video = await Video.FindById(videoId)
+    const video = await Video.findById(videoId)
 
     if(!video){
         throw new ApiError( 404 , "Video not found")
     }
 
     if(video.owner.toString() !== req.user._id.toString()){
-    throw new ApiError(403, "You cannot update thius video")
+    throw new ApiError(403, "You cannot delete this video")
    }
    await Video.findByIdAndDelete(videoId)
 
@@ -237,4 +237,37 @@ const deleteVideo = asyncHandler(async(req,res)=> {
 
 })
 
-export { publishVideo , getVideobyId ,  getAllVideos , updateVideo};
+const togglePublishStatus = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+    
+    if(!mongoose.isValidObjectId(videoId)){
+        throw new ApiError(400 , "Invalid video Id")
+     }
+    
+     const video = await Video.findById(videoId)
+
+     if(!video){
+        throw new ApiError (404 , "Video not found")
+     }
+    
+     if(video.owner.toString() !== req.user._id.toString()){
+    throw new ApiError(403, "You cannot delete this video")
+   };
+
+   video.isPublished = !video.isPublished ;
+
+   await video.save();
+
+   return res
+   .status(200)
+   .json(
+    new ApiResponse(
+        200,
+        video,
+        "Video publish status updated successfully"
+    )
+   )
+
+})
+
+export { publishVideo , getVideobyId ,  getAllVideos , updateVideo , deleteVideo , togglePublishStatus};
