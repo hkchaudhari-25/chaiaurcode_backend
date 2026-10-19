@@ -15,7 +15,7 @@ const publishVideo = asyncHandler(async (req, res) => {
             "Title and description are required"
         )
     }
-    const videoLocalPath = req.files?.videoFile?.[0]?.path;
+    const videoLocalPath = req.files?.videofile?.[0]?.path;
     const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path;
 
     if(!videoLocalPath){
@@ -39,7 +39,7 @@ const publishVideo = asyncHandler(async (req, res) => {
       }
 
       const createdVideo = await Video.create( {
-        videoFile : Videouploaded.url ,
+        videofile : Videouploaded.url ,
         thumbnail: Thumnailuploaded.url ,
         title,
         description,
@@ -69,8 +69,8 @@ const getVideobyId = asyncHandler(async(req , res) => {
     throw new ApiError(400 , "Invalid object ID ")
    }
 
-   const video = Video.findById(videoId);
-    if(!videoId){
+   const video = await Video.findById(videoId);
+    if(!video){
         throw new ApiError(404 , "Video not found")
     }
     return res
@@ -151,15 +151,15 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async(req, res) => {
    const {videoId} = req.params ;
-    const {title ,  description} =  req.params;
+    const {title ,  description} =  req.body;
 
   
    if(!mongoose.isValidObjectId(videoId)){
     throw new ApiError(400 , "Invalid object ID ")
    }
-   const video = await Video.FindById(videoId)
+   const video = await Video.findById(videoId)
 
-   if(!videoId){
+   if(!video){
     throw new ApiError(404, "Video not found")
    }
 
@@ -175,7 +175,7 @@ const updateVideo = asyncHandler(async(req, res) => {
     throw new ApiError(400, "Provide at least one field to update");
     }
 
-    if(title !== umdefined()){
+    if(title !== undefined){
         video.title = title.trim()
     }
 
