@@ -207,6 +207,34 @@ const updateVideo = asyncHandler(async(req, res) => {
 
 })
 
+const deleteVideo = asyncHandler(async(req,res)=> {
+    const {videoId} = req.params
 
+    if(!mongoose.isValidObjectId(videoId)){
+        throw new ApiError(401 , "Invalid video Id")
+    }
+
+    const video = await Video.FindById(videoId)
+
+    if(!video){
+        throw new ApiError( 404 , "Video not found")
+    }
+
+    if(video.owner.toString() !== req.user._id.toString()){
+    throw new ApiError(403, "You cannot update thius video")
+   }
+   await Video.findByIdAndDelete(videoId)
+
+   return res
+   .status(200)
+   .json(
+    new ApiResponse(
+        200,
+        {},
+        "Video deleted successfully"
+    )
+   )
+
+})
 
 export { publishVideo , getVideobyId ,  getAllVideos , updateVideo};
