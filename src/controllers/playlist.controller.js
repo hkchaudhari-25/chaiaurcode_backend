@@ -184,7 +184,7 @@ const updatePlaylist = asyncHandler(async(req, res) =>{
     }
 
     if((name !== undefined && !name.trim()) || (description !== undefined && !description.trim())){
-        throw new ApiError(403 , "Name or Description cnnot be left empty.")
+        throw new ApiError(403 , "Name or Description cannot be left empty.")
     }
 
     if (name === undefined && description === undefined) {

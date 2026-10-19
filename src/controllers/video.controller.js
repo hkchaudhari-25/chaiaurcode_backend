@@ -150,5 +150,63 @@ const getAllVideos = asyncHandler(async (req, res) => {
   );
 });
 
+const updateVideo = asyncHandler(async(req, res) => {
+   const {videoId} = req.params ;
+    const {title ,  description} =  req.params;
 
-export { publishVideo , getVideobyId ,  getAllVideos};
+  
+   if(!mongoose.isValidObjectId(videoId)){
+    throw new ApiError(400 , "Invalid object ID ")
+   }
+   const video = await Video.FindById(videoId)
+
+   if(!videoId){
+    throw new ApiError(404, "Video not found")
+   }
+
+   if(video.owner.toString() !== req.user._id.toString()){
+    throw new ApiError(403, "You cannot update thius video")
+   }
+
+   if((title !== undefined && !title.trim()) || (description !== undefined && !description.trim())){
+        throw new ApiError(403 , "Name or Description cannot be left empty.")
+    }
+
+    if (title === undefined && description === undefined) {
+    throw new ApiError(400, "Provide at least one field to update");
+    }
+
+    if(title !== umdefined()){
+        video.title = title.trim()
+    }
+
+    if(description !== undefined){
+        video.description= description.trim()
+    }
+
+       if (req.file?.path) {
+        const thumbnail = await uploadFileCloudinary(req.file.path);
+
+        if (!thumbnail?.url) {
+            throw new ApiError(500, "Thumbnail upload failed");
+        }
+
+        video.thumbnail = thumbnail.url;
+    }
+
+    await video.save();
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            video,
+            "Video updated successfully"
+        )
+    );
+
+
+})
+
+
+
+export { publishVideo , getVideobyId ,  getAllVideos , updateVideo};
