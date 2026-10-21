@@ -48,6 +48,7 @@ const getUserTweet = asyncHandler(async (req, res)=> {
     const tweets = await Tweet.find({
         owner: userId
     }).sort({createdAt : -1})
+        
 
         return res
         .status(200)
@@ -61,13 +62,14 @@ const getUserTweet = asyncHandler(async (req, res)=> {
 })
 
 const updateTweet = asyncHandler(async(req, res) => {
-    const {tweetId} = req.body
-    const {userId} = req.params
+    const {tweetId} = req.params
+    const {content} = req.body
+    
 
-    if((!tweetId)||(!userId)){
+    if((!tweetId)){
         throw new ApiError("Both fields are required .. ")
     }
-    if(!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(tweetId)){
+    if(!mongoose.isValidObjectId(tweetId)){
         throw new ApiError(403 , "Id is invalid")
     }
 
@@ -77,9 +79,7 @@ const updateTweet = asyncHandler(async(req, res) => {
         throw new ApiError(404 , "Tweet not found.")
     }
 
-    if(tweet.owner.toString() !== tweet.user._id.toString()){
-        throw new ApiError(403 ,  "you cannot update this tweet due to lack of ownership")
-    }
+   
     tweet.content = content.trim()
     await tweet.save()
 
@@ -95,13 +95,13 @@ const updateTweet = asyncHandler(async(req, res) => {
 });
 
 const deleteTweet = asyncHandler(async (req, res) => {
-     const {tweetId} = req.body
-    const {userId} = req.params
+     const {tweetId} = req.params
+    
 
-    if((!tweetId)||(!userId)){
+    if((!tweetId)){
         throw new ApiError("Both fields are required .. ")
     }
-    if(!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(tweetId)){
+    if( !mongoose.isValidObjectId(tweetId)){
         throw new ApiError(403 , "Id is invalid")
     }
 
@@ -111,9 +111,9 @@ const deleteTweet = asyncHandler(async (req, res) => {
         throw new ApiError("Tweet not found.")
     }
 
-    if(tweet.owner.toString() != tweet.user._id.toString()){
-        throw new ApiError(403 ,  "you cannot update this tweet due to lack of ownership")
-    }
+    // if(tweet.owner.toString() != tweet.user._id.toString()){
+    //     throw new ApiError(403 ,  "you cannot update this tweet due to lack of ownership")
+    // }
 
     await Tweet.findByIdAndDelete(tweetId)
     
