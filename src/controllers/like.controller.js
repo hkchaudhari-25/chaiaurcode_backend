@@ -4,9 +4,11 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {Video} from "../models/video.model.js"
+import {Tweet} from "../models/tweet.model.js"
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
+  
 
     if (!mongoose.isValidObjectId(videoId)) {
         throw new ApiError(400, "Invalid videoId");
@@ -118,20 +120,68 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 });
 
 const getLikedVideos = asyncHandler(async (req, res) => {
-   const likedVideos = await Like.find({
-    likedBy : req.user._id, 
-    video : {$ne : null}
-   }).populate("video");
-   
-   return res
-   .status(200)
-   .json(
-    new ApiResponse(
-        200,
-        likedVideos,
-        "Liked videos fetched successfully .."
-    )
-   )
-})
+    
+    // console.log("=== ENTERED GET LIKED VIDEOS ===");
+    // console.log("User ID:", req.user?._id);
+    
+    // const likedVideos = await Like.aggregate([
+    //     {
+    //         $match: {
+    //             likedBy: new mongoose.Types.ObjectId(req.user._id),
+    //             video: { $exists: true, $ne: null } // Ensure video exists in the like document
+    //         }
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: "videos", // Name of the videos collection in MongoDB
+    //             localField: "video",
+    //             foreignField: "_id",
+    //             as: "video",
+    //             pipeline: [
+    //                 {
+    //                     $lookup: {
+    //                         from: "users", // To get video owner details if needed
+    //                         localField: "owner",
+    //                         foreignField: "_id",
+    //                         as: "owner"
+    //                     }
+    //                 },
+    //                 {
+    //                     $unwind: "$owner"
+    //                 }
+    //             ]
+    //         }
+    //     },
+    //     {
+    //         $unwind: "$video" // Flattens the video array into an object
+    //     },
+    //     {
+    //         $sort: {
+    //             createdAt: -1 // Most recently liked first
+    //         }
+    //     },
+    //     {
+    //         $project: {
+    //             _id: 0,
+    //             likedVideo: "$video" // Restructures the output nicely
+    //         }
+    //     }
+    // ]);
 
+    // return res.status(200).json(
+    //     new ApiResponse(200, likedVideos, "Liked videos fetched successfully")
+    // );
+        const likedVideos = await Like.find({
+        likedBy: req.user._id,
+        video: { $ne: null },
+    }).populate("video");
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            likedVideos,
+            "Liked videos fetched successfully"
+        )
+    );
+});
 export {toggleVideoLike , toggleCommentLike , toggleTweetLike , getLikedVideos}
