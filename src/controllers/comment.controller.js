@@ -11,10 +11,10 @@ const getVideoComments = asyncHandler(async (req,res) =>{
     const {page = 1 , limit =10} = req.query
 
     if(!mongoose.isValidObjectId(videoId)){
-        throw new ApiError(403 , "invalid video id")
+        throw new ApiError(400 , "invalid video id")
     }
 
-    const {video}  = await Video.findById(videoId)
+    const video  = await Video.findById(videoId)
 
     if(!video){
         throw new ApiError(404 , "Video not found")

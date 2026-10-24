@@ -1,10 +1,10 @@
-import Router from "express";
+import {Router} from "express";
 import {
     getVideoComments, 
     addComment, 
     updateComment,
      deleteComment
-    } from "../routes/comments.routes.js"
+    } from "../controllers/comment.controller.js"
 
 import { verifyJWT } from "../middleware/auth.middleware.js"
 
@@ -14,9 +14,9 @@ router.use(verifyJWT)
 
 router.route("/:videoId")
         .get(getVideoComments)
-        .post(addComment)
+        .post( addComment)
         
-router.route("/:commentId")
+router.route("/c/:commentId")
         .delete(deleteComment)
         .patch(updateComment)
 

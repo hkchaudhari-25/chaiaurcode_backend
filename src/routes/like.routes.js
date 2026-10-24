@@ -11,7 +11,7 @@ router.route("/toggle/v/:videoId").post(toggleVideoLike)
 
 router.route("/toggle/t/:tweetId").post(toggleTweetLike)
 
-router.route("/toggle/C/:commentId").post(toggleCommentLike)
+router.route("/toggle/c/:commentId").post(toggleCommentLike)
 
 router.route("/likedvideos").get(getLikedVideos)
 
